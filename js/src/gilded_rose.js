@@ -13,50 +13,73 @@ items.push(new Item('Sulfuras, Hand of Ragnaros', 0, 80));
 items.push(new Item('Backstage passes to a TAFKAL80ETC concert', 15, 20));
 items.push(new Item('Conjured Mana Cake', 3, 6));
 
+var GildedRose = {
+  MAX_QUALITY: 50,
+  MIN_QUALITY: 0,
+  SpecialType: {
+    AgedBrie: "Aged Brie",
+    Backstage: "Backstage passes to a TAFKAL80ETC concert",
+    Sulfuras: "Sulfuras, Hand of Ragnaros"
+  }
+};
+
 function update_quality() {
-  for (var i = 0; i < items.length; i++) {
-    if (items[i].name != 'Aged Brie' && items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-      if (items[i].quality > 0) {
-        if (items[i].name != 'Sulfuras, Hand of Ragnaros') {
-          items[i].quality = items[i].quality - 1
-        }
-      }
+  items.map(update_item_quality);
+}
+
+function is_sulfuras(item) {
+  return item.name == GildedRose.SpecialType.Sulfuras;
+}
+
+function is_aged_brie(item) {
+  return item.name == GildedRose.SpecialType.AgedBrie;
+}
+
+function is_backstage(item) {
+  return item.name == GildedRose.SpecialType.Backstage;
+}
+
+function is_passed(item) {
+  return item.sell_in < 0;
+}
+
+function get_backstage_quality_increase_for_sell_in(sell_in) {
+  return (sell_in > 10) ? 1 : (sell_in > 5)  ?  2 : 3;
+}
+
+function update_item_quality(item) {
+  if (is_sulfuras(item)) return;
+
+  if (is_aged_brie(item)) {
+    increase_quality(item);
+  } else if (is_backstage(item)) {
+    increase_quality(item, get_backstage_quality_increase_for_sell_in(item.sell_in));
+  } else {
+    decrease_quality(item);
+  }
+
+  decrease_sell_in(item);
+
+  if (is_passed(item)) {
+    if (is_aged_brie(item)) {
+      increase_quality(item);
+    } else if (is_backstage(item)) {
+      item.quality = 0;
     } else {
-      if (items[i].quality < 50) {
-        items[i].quality = items[i].quality + 1
-        if (items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-          if (items[i].sell_in < 11) {
-            if (items[i].quality < 50) {
-              items[i].quality = items[i].quality + 1
-            }
-          }
-          if (items[i].sell_in < 6) {
-            if (items[i].quality < 50) {
-              items[i].quality = items[i].quality + 1
-            }
-          }
-        }
-      }
-    }
-    if (items[i].name != 'Sulfuras, Hand of Ragnaros') {
-      items[i].sell_in = items[i].sell_in - 1;
-    }
-    if (items[i].sell_in < 0) {
-      if (items[i].name != 'Aged Brie') {
-        if (items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-          if (items[i].quality > 0) {
-            if (items[i].name != 'Sulfuras, Hand of Ragnaros') {
-              items[i].quality = items[i].quality - 1
-            }
-          }
-        } else {
-          items[i].quality = items[i].quality - items[i].quality
-        }
-      } else {
-        if (items[i].quality < 50) {
-          items[i].quality = items[i].quality + 1
-        }
-      }
+      decrease_quality(item);
     }
   }
+}
+
+function increase_quality(item, increment) {
+  increment = increment || 1;
+  item.quality = Math.min(GildedRose.MAX_QUALITY, item.quality + increment);
+}
+
+function decrease_quality(item) {
+  item.quality = Math.max(GildedRose.MIN_QUALITY, item.quality - 1);
+}
+
+function decrease_sell_in(item) {
+  item.sell_in = item.sell_in - 1;
 }
