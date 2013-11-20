@@ -97,6 +97,18 @@ describe("Gilded Rose application", function() {
       expect(items.pop().quality).toBe(0);
     });
 
+    it("should decrease quality by 2 for Conjured item not passed", function() {
+      items.push(new Item(GildedRose.SpecialType.Conjured, 1, 10));
+      update_quality();
+      expect(items.pop().quality).toBe(8);
+    });
+
+    it("should decrease quality by 4 for Conjured item passed", function() {
+      items.push(new Item(GildedRose.SpecialType.Conjured, 0, 10));
+      update_quality();
+      expect(items.pop().quality).toBe(6);
+    });
+
   });
 
 });

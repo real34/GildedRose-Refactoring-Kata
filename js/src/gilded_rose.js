@@ -19,6 +19,7 @@ var GildedRose = {
   SpecialType: {
     AgedBrie: "Aged Brie",
     Backstage: "Backstage passes to a TAFKAL80ETC concert",
+    Conjured: "Conjured Mana Cake",
     Sulfuras: "Sulfuras, Hand of Ragnaros"
   }
 };
@@ -37,6 +38,10 @@ function is_aged_brie(item) {
 
 function is_backstage(item) {
   return item.name == GildedRose.SpecialType.Backstage;
+}
+
+function is_conjured(item) {
+  return item.name == GildedRose.SpecialType.Conjured;
 }
 
 function is_passed(item) {
@@ -77,7 +82,8 @@ function increase_quality(item, increment) {
 }
 
 function decrease_quality(item) {
-  item.quality = Math.max(GildedRose.MIN_QUALITY, item.quality - 1);
+  var decrement = is_conjured(item) ? 2 : 1;
+  item.quality = Math.max(GildedRose.MIN_QUALITY, item.quality - decrement);
 }
 
 function decrease_sell_in(item) {
